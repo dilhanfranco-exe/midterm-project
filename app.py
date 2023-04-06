@@ -1,23 +1,26 @@
-from flask import Flask, abort, render_template, request, redirect, url_for, session
+from flask import Flask, abort, render_template, request, redirect, url_for, session, jsonify
 import pymysql
 from flask_cors import CORS
 import re
 import os
+import jwt
 from werkzeug.utils import secure_filename
+from functools import wraps
+from datetime import datetime, timedelta
 
 # activate the virtual environment
 #. venv/bin/activate 
 
 app = Flask(__name__)
 
-
+app.config['SECRET_KEY'] = 'cba48681230f44d2a67477fffec7bf44' # Randomly genarated secret key from uuid approach
 # CORS(app)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 conn = pymysql.connect(
         host='localhost',
         user='root', 
-        password = "1234567890",
+        password = "1234567890", 
         db='midterm_project',
 		cursorclass=pymysql.cursors.DictCursor
         )
@@ -32,6 +35,20 @@ app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif']
 app.config['UPLOAD_PATH'] = 'uploads'
 UPLOAD_FOLDER = '/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
+
+def token_required(func):
+	@wraps(func)
+	def decorated(*args, **kwargs):
+		token = request.args.get('token')
+		if not token:
+			return jsonify({'Alert!': 'Token is missing!'}), 401
+		try:
+			data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+
+		except:
+			return jsonify({'Alert!': 'Invalid token'}), 403
+		return func(*args, **kwargs)
+	return decorated
 
 @app.route('/')
 @app.route('/public')
@@ -55,11 +72,24 @@ def login():
 			session['id'] = account['id']
 			session['username'] = account['username']
 			msg = 'Logged In Successfully.'
-			return render_template('index.html', msg = msg)
+			session['logged_in'] = True
+			token = jwt.encode({
+				'user': request.form['username'],
+				'expiration': str(datetime.utcnow() + timedelta(seconds=60))
+			},app.config['SECRET_KEY'])
+			print(token)
+			# data = jwt.decode(token, app.config['SECRET_KEY'])
+			# print(data)
+			return redirect(url_for('index', token = token))
+	
+			# return render_template('index.html', msg = msg)
 
 		else:
 			msg = 'Invalid Credentials. Please Try Again.'
-	return render_template('login.html', msg = msg)
+
+		
+	else:
+		return render_template('login.html', msg = msg)
 
 @app.route('/logout')
 def logout():
@@ -98,6 +128,7 @@ def register():
 	return render_template('register.html', msg = msg)
 
 @app.route("/index")
+@token_required
 def index():
 	if 'loggedin' in session:
 		return render_template("index.html")
