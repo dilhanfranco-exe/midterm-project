@@ -9,7 +9,7 @@
 	</head>
 	<body>
         <ul>
-            <li><a href="{{ url_for('index')}}">Home</a></li>
+            <li><a href="{{ url_for('index' , token = session.token)}}">Home</a></li>
             <li><a href="{{ url_for('logout')}}">Logout</a></li>
         </ul>
         <h1 class="d-flex justify-content-center">Admin Page</h1>
