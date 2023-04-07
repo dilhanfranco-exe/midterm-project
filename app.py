@@ -13,14 +13,14 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'cba48681230f44d2a67477fffec7bf44' # Randomly genarated secret key from uuid approach
+app.config['SECRET_KEY'] = 'cba48681230f44d2a67477fffec7bf44' # Randomly generated secret key from uuid approach
 # CORS(app)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 conn = pymysql.connect(
         host='localhost',
         user='root', 
-        password = "1234567890", 
+        password = "root1234", 
         db='midterm_project',
 		cursorclass=pymysql.cursors.DictCursor
         )
@@ -72,22 +72,16 @@ def login():
 			session['id'] = account['id']
 			session['username'] = account['username']
 			msg = 'Logged In Successfully.'
-			session['logged_in'] = True
 			token = jwt.encode({
 				'user': request.form['username'],
 				'expiration': str(datetime.utcnow() + timedelta(seconds=60))
 			},app.config['SECRET_KEY'])
-			print(token)
-			# data = jwt.decode(token, app.config['SECRET_KEY'])
-			# print(data)
 			return redirect(url_for('index', token = token))
-	
-			# return render_template('index.html', msg = msg)
 
 		else:
 			msg = 'Invalid Credentials. Please Try Again.'
+			return render_template('login.html', msg = msg)
 
-		
 	else:
 		return render_template('login.html', msg = msg)
 
