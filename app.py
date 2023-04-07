@@ -76,6 +76,7 @@ def login():
 				'user': request.form['username'],
 				'expiration': str(datetime.utcnow() + timedelta(seconds=60))
 			},app.config['SECRET_KEY'])
+			session['token'] = token
 			return redirect(url_for('index', token = token))
 
 		else:
@@ -142,6 +143,7 @@ def upload_files():
 
 
 @app.route("/admin")
+@token_required
 def admin():
 	# if the session username isn't "admin"
 	if session['username'] != 'admin':

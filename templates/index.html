@@ -9,9 +9,9 @@
 	</head>
 	<body>
         <ul>
-            <li><a href="{{ url_for('index')}}">Home</a></li>
+            <li><a href="{{ url_for('index', token = session.token)}}">Home</a></li>
             <li><a href="{{ url_for('logout')}}">Logout</a></li>
-            <li><a href="{{ url_for('admin')}}">Admin</a></li>
+            <li><a href="{{ url_for('admin', token = session.token)}}">Admin</a></li>
         </ul>
         <h1 class="d-flex justify-content-center">Index Page</h1>
         <div class = "d-flex justify-content-center">
