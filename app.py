@@ -53,7 +53,18 @@ def token_required(func):
 @app.route('/')
 @app.route('/public')
 def public():
+
     return render_template('public.html')
+@approute('/public/items', methods=['GET'])
+def get_public_items():
+	#get public items
+	public_items = [
+		{"user": 1, "name": "Bazinga"},
+		{"user": 2, "name": "Rhi Rhi"},
+		{"user": 3, "name": "The Rock"}
+	]
+	#converting list into a JSON rsponse
+	return jsonify(public_items)
 
 @app.route('/login', methods =['GET', 'POST'])
 def login():
