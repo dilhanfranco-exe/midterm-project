@@ -7,6 +7,7 @@ import jwt
 from werkzeug.utils import secure_filename
 from functools import wraps
 from datetime import datetime, timedelta
+import json
 
 # activate the virtual environment
 #. venv/bin/activate 
@@ -17,10 +18,17 @@ app.config['SECRET_KEY'] = 'cba48681230f44d2a67477fffec7bf44' # Randomly generat
 # CORS(app)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
+#data that is open to the public
+results = [
+	{"user": 1, "name": "Bazinga"},
+	{"user": 2, "name": "Rhi Rhi"},
+	{"user": 3, "name": "The Rock"}
+]
+
 conn = pymysql.connect(
         host='localhost',
         user='root', 
-        password = "root1234", 
+        password = "1234567890", 
         db='midterm_project',
 		cursorclass=pymysql.cursors.DictCursor
         )
@@ -54,18 +62,8 @@ def token_required(func):
 @app.route('/')
 @app.route('/public')
 def public():
+	return render_template('public.html', results=results)
 
-    return render_template('public.html')
-@app.route('/public/items', methods=['GET'])
-def get_public_items():
-	#get public items
-	public_items = [
-		{"user": 1, "name": "Bazinga"},
-		{"user": 2, "name": "Rhi Rhi"},
-		{"user": 3, "name": "The Rock"}
-	]
-	#converting list into a JSON rsponse
-	return jsonify(public_items)
 
 @app.route('/login', methods =['GET', 'POST'])
 def login():

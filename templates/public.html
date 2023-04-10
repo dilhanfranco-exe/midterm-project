@@ -13,5 +13,11 @@
             <li><a href="{{ url_for('login')}}">Login</a></li>
         </ul>
         <h1 class="d-flex justify-content-center">Public Page</h1>  
+
+        <h3 class="d-flex justify-content-center"> This is data open to everyone!</h3>
+
+        {% for result in results %}
+            <p class="d-flex justify-content-center">{{result}}</p>
+        {% endfor %}
 	</body>
 </html>
