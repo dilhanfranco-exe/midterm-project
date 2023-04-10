@@ -36,6 +36,7 @@ app.config['UPLOAD_PATH'] = 'uploads'
 UPLOAD_FOLDER = '/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
 
+# decorator for token authentication
 def token_required(func):
 	@wraps(func)
 	def decorated(*args, **kwargs):
@@ -55,7 +56,7 @@ def token_required(func):
 def public():
 
     return render_template('public.html')
-@approute('/public/items', methods=['GET'])
+@app.route('/public/items', methods=['GET'])
 def get_public_items():
 	#get public items
 	public_items = [
@@ -83,6 +84,7 @@ def login():
 			session['id'] = account['id']
 			session['username'] = account['username']
 			msg = 'Logged In Successfully.'
+			# uses jwt to generate a token
 			token = jwt.encode({
 				'user': request.form['username'],
 				'expiration': str(datetime.utcnow() + timedelta(seconds=60))
